@@ -8,7 +8,7 @@
 [![Dockerhub Downloads Number](https://img.shields.io/docker/pulls/nerdneils/go-ddg-chat-api)](https://hub.docker.com/r/nerdneils/go-ddg-chat-api)
 [![Github Downloads Number](https://img.shields.io/github/downloads/nerdneilsfield/go-ddg-chat-api/total)](https://github.com/nerdneilsfield/go-ddg-chat-api/releases)
 [![GitHub Release](https://img.shields.io/github/release/nerdneilsfield/go-ddg-chat-api)](https://github.com/nerdneilsfield/go-ddg-chat-api/releases)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nerdneilsfield/go-ddg-chat-api/test.yml?branch=main)](https://github.com/nerdneilsfield/go-ddg-chat-api/actions)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nerdneilsfield/go-ddg-chat-api/goreleaser.yml?branch=master)](https://github.com/nerdneilsfield/go-ddg-chat-api/actions)
 
 ---
 
