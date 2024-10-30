@@ -1,11 +1,12 @@
 # Go DuckDuckGo Chat API
 
-![DuckDuckGo Chat API](https://duckduckgo.com/duckduckgo-help-pages/logo.v109.svg)
-
+![DuckDuckGo Chat API ](https://duckduckgo.com/duckduckgo-help-pages/logo.v109.svg)
 
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/go-ddg-chat-api)](https://artifacthub.io/packages/search?repo=go-ddg-chat-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/nerdneilsfield/go-ddg-chat-api)](https://goreportcard.com/report/github.com/nerdneilsfield/go-ddg-chat-api)
 [![Docker Image Size](https://img.shields.io/docker/image-size/nerdneils/go-ddg-chat-api)](https://hub.docker.com/r/nerdneils/go-ddg-chat-api)
+[![Dockerhub Downloads Number](https://img.shields.io/docker/pulls/nerdneils/go-ddg-chat-api)](https://hub.docker.com/r/nerdneils/go-ddg-chat-api)
+[![Github Downloads Number](https://img.shields.io/github/downloads/nerdneilsfield/go-ddg-chat-api/total)](https://github.com/nerdneilsfield/go-ddg-chat-api/releases)
 [![GitHub Release](https://img.shields.io/github/release/nerdneilsfield/go-ddg-chat-api)](https://github.com/nerdneilsfield/go-ddg-chat-api/releases)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/nerdneilsfield/go-ddg-chat-api/test.yml?branch=main)](https://github.com/nerdneilsfield/go-ddg-chat-api/actions)
 
@@ -25,9 +26,11 @@ A Go implementation that provides an OpenAI-compatible API interface for DuckDuc
 
 ## Supported Models
 
-```go:ddg-chat/models.go
-startLine: 4
-endLine: 9
+```toml
+"ddg/gpt-4o-mini" = "gpt-4o-mini"
+"ddg/claude-3-haiku" = "claude-3-haiku-20240307"
+"ddg/mixtral-8x7b" = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+"ddg/meta-Llama-3-1-70B-Instruct-Turbo" = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
 ```
 
 ## Installation
@@ -53,9 +56,18 @@ docker pull ghcr.io/nerdneilsfield/go-ddg-chat-api
 
 Create a `config.toml` file:
 
-```toml:config.toml
-startLine: 1
-endLine: 12
+```toml
+port = 8085
+host = "0.0.0.0"
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+tokens = ["duckduckgo-chat-api-token"]
+ddg_chat_api_url = "https://duckduckgo.com/"
+
+[model_mapping]
+"ddg/gpt-4o-mini" = "gpt-4o-mini"
+"ddg/claude-3-haiku" = "claude-3-haiku-20240307"
+"ddg/mixtral-8x7b" = "mistralai/Mixtral-8x7B-Instruct-v0.1"
+"ddg/meta-Llama-3-1-70B-Instruct-Turbo" = "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
 ```
 
 ## Usage
