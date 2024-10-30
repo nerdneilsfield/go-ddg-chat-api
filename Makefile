@@ -1,4 +1,4 @@
-projectname?=go-template
+projectname?=go-ddg-chat-api
 
 default: help
 

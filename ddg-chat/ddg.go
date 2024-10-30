@@ -22,6 +22,7 @@ func generateUUID() string {
 	return uuid.New().String()
 }
 
+// Get VQD token from DuckDuckGo API for authentication
 func updateVQDToken(userAgent string, config *Config) (string, error) {
 	logger.Debug("updating VQD token")
 	client := createProxyClient()
@@ -61,7 +62,9 @@ func updateVQDToken(userAgent string, config *Config) (string, error) {
 	return vqdToken, nil
 }
 
+// Main chat function to interact with DuckDuckGo API
 func chatWithDuckDuckGo(query string, model string, history []ChatMessage, channel chan string, config *Config) error {
+	logger.Debug("chat with duckduckgo", zap.String("query", query), zap.String("model", model))
 	originalModel := config.ModelMapping[model]
 	if originalModel == "" {
 		originalModel = model
@@ -78,7 +81,7 @@ func chatWithDuckDuckGo(query string, model string, history []ChatMessage, chann
 		return err
 	}
 
-	// 处理系统消息
+	// Process system message and user messages
 	var systemMsg *ChatMessage
 	var userMsgs []map[string]string
 
@@ -93,8 +96,11 @@ func chatWithDuckDuckGo(query string, model string, history []ChatMessage, chann
 		}
 	}
 
-	if systemMsg != nil && len(userMsgs) > 0 {
-		userMsgs[0]["content"] = fmt.Sprintf("%s\n\n%s", systemMsg.Content, userMsgs[0]["content"])
+	// Combine system message with first user message if exists
+	if systemMsg != nil {
+		for i := range userMsgs {
+			userMsgs[i]["content"] = fmt.Sprintf("%s\n\n%s", systemMsg.Content, userMsgs[i]["content"])
+		}
 	}
 
 	payload := map[string]interface{}{
@@ -102,7 +108,8 @@ func chatWithDuckDuckGo(query string, model string, history []ChatMessage, chann
 		"model":    originalModel,
 	}
 
-	// 发送请求到DuckDuckGo
+	logger.Debug("payload", zap.Any("payload", payload))
+
 	client := createProxyClient()
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
@@ -119,26 +126,22 @@ func chatWithDuckDuckGo(query string, model string, history []ChatMessage, chann
 	return streamDuckDuckGoResponse(client, req, channel, config)
 }
 
+// Handle streaming response from DuckDuckGo API with retry mechanism
 func streamDuckDuckGoResponse(client *fasthttp.Client, req *fasthttp.Request, channel chan string, config *Config) error {
-	// 创建响应对象
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
 
-	// 设置请求为流式
 	req.SetConnectionClose()
 
-	// 发送请求并获取响应
 	if err := client.Do(req, resp); err != nil {
 		return fmt.Errorf("failed to send request: %v", err)
 	}
 
-	// 检查响应状态码
 	statusCode := resp.StatusCode()
 	if statusCode != fasthttp.StatusOK {
 		return fmt.Errorf("unexpected status code: %d", statusCode)
 	}
 
-	// 读取响应体
 	body := resp.Body()
 	reader := bufio.NewReader(bytes.NewReader(body))
 
@@ -146,7 +149,6 @@ func streamDuckDuckGoResponse(client *fasthttp.Client, req *fasthttp.Request, ch
 	retryCount := 0
 
 	for {
-		// 读取每一行
 		line, err := reader.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
@@ -155,17 +157,15 @@ func streamDuckDuckGoResponse(client *fasthttp.Client, req *fasthttp.Request, ch
 			return fmt.Errorf("error reading response: %v", err)
 		}
 
-		// 处理 Server-Sent Events 格式
+		// Process Server-Sent Events
 		if strings.HasPrefix(line, "data: ") {
 			data := strings.TrimPrefix(line, "data: ")
 			data = strings.TrimSpace(data)
 
-			// 检查是否是结束标记
 			if data == "[DONE]" {
 				break
 			}
 
-			// 解析JSON响应
 			var jsonResponse struct {
 				Message string `json:"message"`
 			}
@@ -175,16 +175,14 @@ func streamDuckDuckGoResponse(client *fasthttp.Client, req *fasthttp.Request, ch
 				continue
 			}
 
-			// 发送消息到channel
 			channel <- jsonResponse.Message
 		}
 
-		// 处理响应状态码429 (Rate Limit)
+		// Handle rate limiting with retries
 		if statusCode == 429 && retryCount < maxRetries {
 			retryCount++
 			logger.Warn("Rate limit exceeded, retry attempt %d of %d", zap.Int("retryCount", retryCount), zap.Int("maxRetries", maxRetries))
 
-			// 获取新的User-Agent和VQD token
 			var userAgent string
 			if config.UserAgent == "" {
 				userAgent = getRandomUserAgent()
@@ -197,17 +195,14 @@ func streamDuckDuckGoResponse(client *fasthttp.Client, req *fasthttp.Request, ch
 				continue
 			}
 
-			// 更新请求头
 			req.Header.Set("User-Agent", userAgent)
 			req.Header.Set("x-vqd-4", vqdToken)
 
-			// 重新发送请求
 			if err := client.Do(req, resp); err != nil {
 				logger.Error("Retry request failed: %v", zap.Error(err))
 				continue
 			}
 
-			// 重置reader
 			body = resp.Body()
 			reader = bufio.NewReader(bytes.NewReader(body))
 			statusCode = resp.StatusCode()
@@ -218,6 +213,7 @@ func streamDuckDuckGoResponse(client *fasthttp.Client, req *fasthttp.Request, ch
 	return nil
 }
 
+// Create HTTP client with proxy support if configured
 func createProxyClient() *fasthttp.Client {
 	proxyURL := os.Getenv("https_proxy")
 	if proxyURL == "" {
@@ -227,7 +223,6 @@ func createProxyClient() *fasthttp.Client {
 		return &fasthttp.Client{}
 	}
 
-	// 解析代理URL
 	parsedProxyURL, err := url.Parse(proxyURL)
 	if err != nil {
 		log.Printf("Error parsing proxy URL: %v", err)
@@ -238,14 +233,12 @@ func createProxyClient() *fasthttp.Client {
 	return &fasthttp.Client{
 		Dial: func(addr string) (net.Conn, error) {
 			logger.Debug("dialing to proxy", zap.String("addr", addr))
-			// 连接到代理服务器
 			proxyConn, err := fasthttp.Dial(parsedProxyURL.Host)
 			if err != nil {
 				logger.Error("error connecting to proxy", zap.Error(err))
 				return nil, fmt.Errorf("error connecting to proxy: %w", err)
 			}
 
-			// 发送 CONNECT 请求
 			_, err = fmt.Fprintf(proxyConn, "CONNECT %s HTTP/1.1\r\nHost: %s\r\n\r\n", addr, addr)
 			if err != nil {
 				proxyConn.Close()
@@ -253,7 +246,6 @@ func createProxyClient() *fasthttp.Client {
 				return nil, fmt.Errorf("error sending CONNECT: %w", err)
 			}
 
-			// 读取响应
 			res := make([]byte, 1024)
 			n, err := proxyConn.Read(res)
 			if err != nil {
@@ -262,7 +254,6 @@ func createProxyClient() *fasthttp.Client {
 				return nil, fmt.Errorf("error reading CONNECT response: %w", err)
 			}
 
-			// 检查是否 200 OK
 			if !bytes.Contains(res[:n], []byte("200 Connection established")) {
 				proxyConn.Close()
 				logger.Error("proxy connection failed", zap.String("response", string(res[:n])))
@@ -274,7 +265,6 @@ func createProxyClient() *fasthttp.Client {
 	}
 }
 
-// 辅助函数：随机生成User-Agent
 func getRandomUserAgent() string {
 	userAgents := []string{
 		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",

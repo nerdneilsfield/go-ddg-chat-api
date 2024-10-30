@@ -10,7 +10,7 @@ env:
 
 builds:
   -
-    binary: go-template
+    binary: go-ddg-chat-api
     ldflags:
       - -s -w
       - -X main.version={{ .Version }}
@@ -49,77 +49,77 @@ builds:
 archives:
   -
     builds:
-      - go-template
+      - go-ddg-chat-api
     format_overrides:
       - goos: windows
         format: zip
-    # files:
-    #   - "config_example.toml"
+    files:
+      - "config.toml"
 
 release:
   github:
     owner: nerdneilsfield
-    name: go-template
+    name: go-ddg-chat-api
 
-# dockers:
-# - image_templates:
-#   - 'nerdneils/go-template:{{ .Tag }}-amd64'
-#   - 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}-amd64'
-#   dockerfile: Dockerfile
-#   use: buildx
-#   build_flag_templates:
-#   - "--pull"
-#   - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/nerdneilsfield/go-template/master/README.md"
-#   - "--label=io.artifacthub.package.maintainers=[{\"name\":\"dengqqi\",\"email\":\"dengqqi935@gmail.com\"}]"
-#   - "--label=io.artifacthub.package.license=MIT"
-#   - "--label=org.opencontainers.image.description=A fast and flexible translation gateway that routes requests to various LLM endpoints with configurable rate limiting and model-specific prompts."
-#   - "--label=org.opencontainers.image.created={{.Date}}"
-#   - "--label=org.opencontainers.image.name={{.ProjectName}}"
-#   - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-#   - "--label=org.opencontainers.image.version={{.Version}}"
-#   - "--label=org.opencontainers.image.source={{.GitURL}}"
-#   - "--platform=linux/amd64"
-#   extra_files:
-#       - "config_example.toml"
-# - image_templates:
-#   - 'nerdneils/go-template:{{ .Tag }}-arm64'
-#   - 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}-arm64'
-#   dockerfile:  Dockerfile
-#   use: buildx
-#   build_flag_templates:
-#   - "--pull"
-#   - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/nerdneilsfield/go-template/master/README.md"
-#   # - "--label=io.artifacthub.package.logo-url=https://raw.githubusercontent.com/nerdneilsfield/ghproxy-go/master/www/static/images/logo.png"
-#   - "--label=io.artifacthub.package.maintainers=[{\"name\":\"dengqqi\",\"email\":\"dengqqi935@gmail.com\"}]"
-#   - "--label=io.artifacthub.package.license=MIT"
-#   - "--label=org.opencontainers.image.description=A fast and flexible translation gateway that routes requests to various LLM endpoints with configurable rate limiting and model-specific prompts."
-#   - "--label=org.opencontainers.image.created={{.Date}}"
-#   - "--label=org.opencontainers.image.name={{.ProjectName}}"
-#   - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-#   - "--label=org.opencontainers.image.version={{.Version}}"
-#   - "--label=org.opencontainers.image.source={{.GitURL}}"
-#   - "--platform=linux/arm64"
-#   goarch: arm64
-#   extra_files:
-#       - "config_example.toml"
+dockers:
+- image_templates:
+  - 'nerdneils/go-ddg-chat-api:{{ .Tag }}-amd64'
+  - 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}-amd64'
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/nerdneilsfield/go-ddg-chat-api/master/README.md"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"dengqqi\",\"email\":\"dengqqi935@gmail.com\"}]"
+  - "--label=io.artifacthub.package.license=MIT"
+  - "--label=org.opencontainers.image.description=A Go implementation that provides an OpenAI-compatible API interface for DuckDuckGo's chat service."
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/amd64"
+  extra_files:
+      - "config.toml"
+- image_templates:
+  - 'nerdneils/go-ddg-chat-api:{{ .Tag }}-arm64'
+  - 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}-arm64'
+  dockerfile:  Dockerfile
+  use: buildx
+  build_flag_templates:
+  - "--pull"
+  - "--label=io.artifacthub.package.readme-url=https://raw.githubusercontent.com/nerdneilsfield/go-ddg-chat-api/master/README.md"
+  - "--label=io.artifacthub.package.logo-url=https://duckduckgo.com/duckduckgo-help-pages/logo.v109.svg"
+  - "--label=io.artifacthub.package.maintainers=[{\"name\":\"dengqqi\",\"email\":\"dengqqi935@gmail.com\"}]"
+  - "--label=io.artifacthub.package.license=MIT"
+  - "--label=org.opencontainers.image.description=A fast and flexible translation gateway that routes requests to various LLM endpoints with configurable rate limiting and model-specific prompts."
+  - "--label=org.opencontainers.image.created={{.Date}}"
+  - "--label=org.opencontainers.image.name={{.ProjectName}}"
+  - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+  - "--label=org.opencontainers.image.version={{.Version}}"
+  - "--label=org.opencontainers.image.source={{.GitURL}}"
+  - "--platform=linux/arm64"
+  goarch: arm64
+  extra_files:
+      - "config.toml"
 
-# docker_manifests:
-# - name_template: 'nerdneils/go-template:{{ .Tag }}'
-#   image_templates:
-#   - 'nerdneils/go-template:{{ .Tag }}-amd64'
-#   - 'nerdneils/go-template:{{ .Tag }}-arm64'
-# - name_template: 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}'
-#   image_templates:
-#   - 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}-amd64'
-#   - 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}-arm64'
-# - name_template: 'nerdneils/go-template:latest'
-#   image_templates:
-#   - 'nerdneils/go-template:{{ .Tag }}-amd64'
-#   - 'nerdneils/go-template:{{ .Tag }}-arm64'
-# - name_template: 'ghcr.io/nerdneilsfield/go-template:latest'
-#   image_templates:
-#   - 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}-amd64'
-#   - 'ghcr.io/nerdneilsfield/go-template:{{ .Tag }}-arm64'
+docker_manifests:
+- name_template: 'nerdneils/go-ddg-chat-api:{{ .Tag }}'
+  image_templates:
+  - 'nerdneils/go-ddg-chat-api:{{ .Tag }}-amd64'
+  - 'nerdneils/go-ddg-chat-api:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}'
+  image_templates:
+  - 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}-amd64'
+  - 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}-arm64'
+- name_template: 'nerdneils/go-ddg-chat-api:latest'
+  image_templates:
+  - 'nerdneils/go-ddg-chat-api:{{ .Tag }}-amd64'
+  - 'nerdneils/go-ddg-chat-api:{{ .Tag }}-arm64'
+- name_template: 'ghcr.io/nerdneilsfield/go-ddg-chat-api:latest'
+  image_templates:
+  - 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}-amd64'
+  - 'ghcr.io/nerdneilsfield/go-ddg-chat-api:{{ .Tag }}-arm64'
 
 checksum:
   name_template: "checksums.txt"
