@@ -1,4 +1,4 @@
-projectname := "go-template"
+projectname := "go-ddg-chat-api"
 
 # 列出所有可用的命令
 default:

@@ -15,8 +15,8 @@ var (
 
 func newRootCmd(version string, buildTime string, gitCommit string) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "go-template",
-		Short: "go-template is a template for go projects.",
+		Use:   "go-ddg-chat-api",
+		Short: "Go implementation of Duckduckgo-chat api proxy to provide openai compatible API",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
 		},
@@ -33,6 +33,7 @@ func newRootCmd(version string, buildTime string, gitCommit string) *cobra.Comma
 	cmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose output")
 
 	cmd.AddCommand(newVersionCmd(version, buildTime, gitCommit))
+	cmd.AddCommand(newRunCmd(version, buildTime, gitCommit))
 	return cmd
 }
 
