@@ -151,3 +151,33 @@ changelog:
       order: 400
     - title: Other work
       order: 9999
+
+# Publish to the nerdneilsfield/homebrew-apps tap and Scoop bucket.
+homebrew_casks:
+  - name: go-ddg-chat-api
+    homepage: https://github.com/nerdneilsfield/go-ddg-chat-api
+    description: DuckDuckGo chat API proxy with an OpenAI-compatible interface
+    binaries:
+      - go-ddg-chat-api
+    directory: Casks
+    repository:
+      owner: nerdneilsfield
+      name: homebrew-apps
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    hooks:
+      post:
+        install_steps: |
+          on_macos do
+            run "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "{{ .StagedPath }}/go-ddg-chat-api"]
+          end
+
+scoops:
+  - name: go-ddg-chat-api
+    homepage: https://github.com/nerdneilsfield/go-ddg-chat-api
+    description: DuckDuckGo chat API proxy with an OpenAI-compatible interface
+    license: MIT
+    directory: bucket
+    repository:
+      owner: nerdneilsfield
+      name: homebrew-apps
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
